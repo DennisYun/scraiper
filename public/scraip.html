@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="blueboard.css" />
+
+    <style>
+      @font-face {
+        font-family: 'Pretendard-Regular';
+        src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff')
+          format('woff');
+      }
+      @font-face {
+        font-family: 'Pretendard-ExtraBold';
+        src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-ExtraBold.woff')
+          format('woff');
+      }
+
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgb(55, 53, 62);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .scraip {
+        position: relative;
+        background-color: rgb(68, 68, 78);
+        border-radius: 30px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+        box-sizing: border-box;
+      }
+
+      .handle {
+        display: flex;
+        justify-content: center;
+      }
+
+      .title {
+        all: unset;
+        font-family: 'Pretendard-ExtraBold';
+        font-size: 20px;
+        color: white;
+      }
+
+      textarea.content {
+        all: unset;
+        flex: 1;
+        font-family: 'Pretendard-Regular';
+        color: white;
+        resize: none;
+        display: none;
+        white-space: pre-wrap;
+      }
+
+      .view {
+        flex: 1;
+        font-family: 'Pretendard-Regular';
+        color: white;
+        overflow: auto;
+        white-space: pre-wrap;
+      }
+
+      .view_button {
+        background-color: rgb(55, 53, 62);
+        color: white;
+        font-family: 'Pretendard-Regular';
+        font-size: 12px;
+        padding: 5px 12px;
+        border-radius: 100px;
+        cursor: pointer;
+        position: absolute;
+        top: 12px;
+        right: 20px;
+      }
+
+      /* === resize handle (fixed direction) === */
+      .sc_handle {
+        position: absolute;
+        right: 8px;
+        bottom: 8px;
+        cursor: nwse-resize;
+        opacity: 0.8;
+        transform: rotate(180deg);
+      }
+
+      .sc_handle svg {
+        display: block;
+      }
+
+      #submit {
+        background-color: rgb(55, 53, 62);
+        font-family: 'Pretendard-Regular';
+        color: white;
+        text-align: center;
+        padding: 10px;
+        border-radius: 100px;
+      }
+    </style>
+
+    <title>Scraip Single</title>
+  </head>
+
+  <body>
+    <div class="scraip" id="scraip">
+      <!-- move handle -->
+      <div class="handle">
+        <svg width="40" height="6">
+          <rect x="0" y="2" width="40" height="2" rx="1" fill="white" />
+        </svg>
+      </div>
+
+      <!-- title -->
+      <input class="title" type="text" />
+
+      <!-- content -->
+      <textarea class="content" id="editor"> </textarea>
+
+      <div class="view" id="viewer"></div>
+      <div id="submit">저장</div>
+      <!-- toggle -->
+      <div class="view_button" id="toggleBtn">편집</div>
+
+      <!-- resize handle -->
+      <div class="sc_handle" id="resizeHandle">
+        <svg width="20" height="20" viewBox="0 0 20 20">
+          <path
+            d="M2 18 A16 16 0 0 1 18 2"
+            fill="none"
+            stroke="white"
+            stroke-width="2.5"
+            stroke-linecap="round"
+          />
+        </svg>
+      </div>
+    </div>
+    <script src="blueboard.js"></script>
+
+    <script>
+      const toggleBtn = document.getElementById('toggleBtn');
+      const textarea = document.getElementById('editor');
+      const view = document.getElementById('viewer');
+      const scraip = document.getElementById('scraip');
+      const submit = document.querySelector('#submit');
+      const title = document.querySelector('.title');
+
+      scraip.style.width = '350px';
+      scraip.style.height = '350px';
+
+      let storage_z_count = localStorage.getItem('z_count');
+      let storage_selected_project = localStorage.getItem('selected_project');
+      let storage_scraips = localStorage.getItem('scraips');
+
+      if (storage_z_count === null) {
+        localStorage.setItem('z_count', '1');
+        storage_z_count = '1';
+      }
+      if (storage_selected_project === null) {
+        localStorage.setItem('selected_project', '');
+        storage_selected_project = '';
+      }
+      if (storage_scraips === null) {
+        localStorage.setItem('scraips', '');
+        storage_scraips = '';
+      }
+
+      let scraip_list = (
+        storage_scraips === '' ? [] : storage_scraips.split('')
+      ).map((scraip) => scraip.split(''));
+
+      const random_number = (Math.floor(Math.random() * 9999) + 1)
+        .toString()
+        .padStart(4, '0');
+      title.value = `Untitled-Scraip-${random_number}`;
+
+      /* === BlueDown 초기 렌더 === */
+      BlueDown.activateAutoFill(textarea);
+      BlueDown.apply(textarea.value, view);
+
+      /* === 편집 / 보기 === */
+      toggleBtn.addEventListener('click', () => {
+        if (toggleBtn.textContent === '편집') {
+          toggleBtn.textContent = '보기';
+          textarea.style.display = 'block';
+          view.style.display = 'none';
+          textarea.focus();
+        } else {
+          toggleBtn.textContent = '편집';
+          BlueDown.apply(textarea.value, view);
+          textarea.style.display = 'none';
+          view.style.display = 'block';
+        }
+      });
+
+      /* === resize === */
+      const handle = document.getElementById('resizeHandle');
+      let resizing = false;
+      let startX, startY, startW, startH;
+
+      handle.addEventListener('mousedown', (e) => {
+        resizing = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        startW = scraip.offsetWidth;
+        startH = scraip.offsetHeight;
+        e.preventDefault();
+      });
+
+      document.addEventListener('mousemove', (e) => {
+        if (!resizing) return;
+        scraip.style.width = startW + (e.clientX - startX) * 2 + 'px';
+        scraip.style.height = startH + (e.clientY - startY) * 2 + 'px';
+      });
+
+      document.addEventListener('mouseup', () => {
+        resizing = false;
+      });
+
+      let view_dragged = false;
+      view.addEventListener('mousedown', () => {
+        view_dragged = false;
+      });
+      view.addEventListener('mousemove', () => {
+        view_dragged = true;
+      });
+      view.addEventListener('mouseup', () => {
+        if (!view_dragged) {
+          const selection = window.getSelection();
+          if (selection && !selection.isCollapsed) return;
+          toggleBtn.click();
+        }
+      });
+
+      submit.addEventListener('click', () => {
+        const extreme_random_number = Math.floor(Math.random() * 9999999) + 1;
+        storage_z_count = (Number(storage_z_count) + 1).toString();
+        localStorage.setItem('z_count', storage_z_count);
+        scraip_list.push([
+          storage_selected_project,
+          title.value,
+          textarea.value,
+          500 + Math.floor(Math.random() * 201) - 100,
+          500 + Math.floor(Math.random() * 201) - 100,
+          storage_z_count,
+          Number(scraip.style.width.replace('px', '')),
+          Number(scraip.style.height.replace('px', '')),
+          extreme_random_number,
+        ]);
+        localStorage.setItem(
+          'scraips',
+          scraip_list.map((scraip) => scraip.join('')).join('')
+        );
+      });
+
+      document.onkeydown = (e) => {
+        if (e.ctrlKey && e.key === 'Enter') {
+          submit.click();
+        }
+      };
+    </script>
+  </body>
+</html>

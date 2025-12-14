@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="blueboard.css" />
+    <style>
+      @font-face {
+        font-family: 'Pretendard-Regular';
+        src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff')
+          format('woff');
+        font-weight: 400;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'Pretendard-ExtraBold';
+        src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-ExtraBold.woff')
+          format('woff');
+      }
+      @font-face {
+        font-family: 'Pretendard-Thin';
+        src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Thin.woff')
+          format('woff');
+      }
+      html {
+        background-color: rgb(55, 53, 62);
+        width: 100vw;
+        height: 100vh;
+        overflow-y: hidden;
+      }
+
+      #projects_box {
+        position: fixed;
+        background-color: rgb(68, 68, 78);
+        border-radius: 30px;
+        padding: 20px;
+        width: 200px;
+        transform: translate(0, -50%);
+        top: 50vh;
+        left: 50px;
+        z-index: 100000;
+        box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.4);
+      }
+
+      #projects_text {
+        font-family: 'Pretendard-ExtraBold';
+        color: white;
+        font-size: 30px;
+        text-align: center;
+        margin: 10px;
+      }
+
+      .project_button {
+        font-family: 'Pretendard-Regular';
+        color: white;
+        font-size: 20px;
+        padding: 10px 10px;
+        border-radius: 100px;
+        transition: background-color 0.2s;
+      }
+
+      .project_button:hover {
+        background-color: rgb(55, 53, 62);
+      }
+
+      .project_selected_button {
+        font-family: 'Pretendard-Regular';
+        color: rgb(68, 68, 78);
+        font-size: 20px;
+        padding: 10px 10px;
+        border-radius: 100px;
+        background-color: white;
+      }
+
+      #project_add_form {
+        margin: 10px 0;
+      }
+
+      #project_add_input {
+        background-color: rgb(55, 53, 62) !important;
+        all: unset;
+        border-radius: 20px;
+        padding: 10px;
+        font-size: 15px;
+        display: block;
+        color: white;
+        font-family: 'Pretendard-Regular';
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      #project_remove_info {
+        font-size: 13px;
+        text-align: center;
+        color: red;
+        font-family: 'Pretendard-Thin';
+        margin-top: 20px;
+      }
+
+      #new_scraip_button {
+        display: flex;
+        align-items: center;
+        font-family: 'Pretendard-Regular';
+        gap: 5px;
+        font-size: 20px;
+        background-color: rgb(68, 68, 78);
+        position: fixed;
+        padding: 5px 15px;
+        border-radius: 100px;
+        color: white;
+        right: 50px;
+        top: 25px;
+        transition: background-color 0.2s, color 0.2s;
+        z-index: 100000;
+        box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.4);
+      }
+
+      #new_scraip_button:hover {
+        background-color: white;
+        color: rgb(55, 53, 62);
+      }
+
+      #new_arrow_button {
+        display: flex;
+        align-items: center;
+        font-family: 'Pretendard-Regular';
+        gap: 5px;
+        font-size: 20px;
+        background-color: rgb(68, 68, 78);
+        position: fixed;
+        padding: 5px 15px;
+        border-radius: 100px;
+        color: white;
+        right: 190px;
+        top: 25px;
+        transition: background-color 0.2s, color 0.2s;
+        z-index: 100000;
+        box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.4);
+      }
+
+      #new_arrow_button:hover {
+        background-color: white;
+        color: rgb(55, 53, 62);
+      }
+
+      .scraip {
+        position: absolute;
+        border-radius: 30px;
+        background-color: rgb(68, 68, 78);
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2);
+        transform: translate(-50%, -50%);
+      }
+
+      .handle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .title {
+        all: unset;
+        color: white;
+        font-family: 'Pretendard-ExtraBold';
+        font-size: 20px;
+      }
+
+      .content {
+        all: unset;
+        flex: 1;
+        color: white;
+        font-family: 'Pretendard';
+        resize: none;
+        display: none;
+      }
+
+      .scraipx {
+        opacity: 0;
+        transition: opacity 0.2s;
+        font-size: 35px;
+        font-family: 'Pretendard';
+        position: absolute;
+        right: 20px;
+        top: 0;
+        color: red;
+      }
+
+      .scraip:hover > .scraipx {
+        opacity: 1;
+      }
+
+      .sc_handle {
+        opacity: 0;
+        transition: opacity 0.2s;
+        position: absolute;
+        bottom: 3px;
+        right: 8px;
+      }
+
+      .scraip:hover > .sc_handle {
+        opacity: 1;
+      }
+
+      #coulomb_mode_box {
+        display: flex;
+        gap: 5px;
+        font-family: 'Pretendard';
+        font-size: 20px;
+        color: white;
+        position: fixed;
+        right: 50px;
+        top: 70px;
+        z-index: 100000;
+        background-color: rgb(68, 68, 78);
+        box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.4);
+        border-radius: 100px;
+        padding: 5px 15px;
+      }
+
+      #coulomb_checkbox {
+        appearance: none;
+        -webkit-appearance: none;
+
+        width: 18px;
+        height: 18px;
+        border: 2px solid white;
+        border-radius: 4px;
+        position: relative;
+        cursor: pointer;
+      }
+
+      #coulomb_checkbox:checked {
+        background: rgb(68, 68, 78);
+        border-color: white;
+      }
+
+      #coulomb_checkbox:checked::after {
+        content: '';
+        position: absolute;
+        left: 4px;
+        top: 1px;
+        width: 5px;
+        height: 9px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+      }
+
+      #screen_width_box {
+        display: flex;
+        gap: 5px;
+        font-family: 'Pretendard';
+        font-size: 20px;
+        color: white;
+        position: fixed;
+        right: 195px;
+        top: 70px;
+        z-index: 100000;
+        align-items: center;
+        background-color: rgb(68, 68, 78);
+        box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.4);
+        border-radius: 100px;
+        padding: 5px 15px;
+      }
+      #screen_width_input {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 120px;
+        height: 10px;
+        background: #ddd;
+        border-radius: 100px;
+      }
+      #screen_width_input::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        background: rgb(55, 53, 62);
+        border-radius: 50%;
+        cursor: pointer;
+      }
+
+      .view_button {
+        background-color: rgb(55, 53, 62);
+        position: absolute;
+        color: white;
+        padding: 5px 12px;
+        border-radius: 100px;
+        font-family: 'Pretendard-Regular';
+        font-size: 12px;
+        right: 50px;
+        top: 12px;
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+
+      .scraip:hover > .view_button {
+        opacity: 1;
+      }
+
+      .view {
+        flex: 1;
+        font-family: 'Pretendard-Regular';
+        color: white;
+        overflow: auto;
+      }
+    </style>
+    <title>Scraiper</title>
+  </head>
+  <body>
+    <div id="projects_box">
+      <div id="projects_text">Scraiper</div>
+      <div id="project_add">
+        <form id="project_add_form">
+          <input
+            type="text"
+            id="project_add_input"
+            placeholder="프로젝트 추가"
+            autocomplete="off"
+          />
+        </form>
+        <div id="project_list"></div>
+        <div id="project_remove_info">
+          프로젝트를 삭제하려면<br />"rm 프로젝트명"을 입력하시오.
+        </div>
+      </div>
+    </div>
+    <div id="new_scraip_button">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        fill="currentColor"
+        viewBox="0 0 16 16"
+      >
+        <path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2.5" />
+      </svg>
+      <div>새 Scraip</div>
+    </div>
+    <div id="new_arrow_button">
+      <!-- <svg
+        width="16"
+        height="16"
+        viewBox="0 0 120 80"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <defs>
+          <marker
+            id="arrowhead"
+            markerWidth="4"
+            markerHeight="4"
+            refX="3.5"
+            refY="2"
+            orient="auto"
+            markerUnits="strokeWidth"
+          >
+            <path d="M0,0 L4,2 L0,4 Z" fill="currentColor" />
+          </marker>
+        </defs>
+
+        <path
+          d="M10 60 C 40 10, 80 10, 110 40"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="10"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          marker-end="url(#arrowhead)"
+        />
+      </svg> -->
+
+      <div>메뉴얼</div>
+    </div>
+    <div id="coulomb_mode_box">
+      <div>쿨롱 모드</div>
+      <input type="checkbox" id="coulomb_checkbox" />
+    </div>
+    <div id="screen_width_box">
+      <div>창 가로 길이</div>
+      <input
+        type="range"
+        min="100"
+        max="500"
+        value="100"
+        id="screen_width_input"
+      />
+      <div id="screen_width_value">100%</div>
+    </div>
+    <div id="scraip_directory"></div>
+    <script src="blueboard.js"></script>
+    <script>
+      const project_add_form = document.querySelector('#project_add_form');
+      const project_add_input = document.querySelector('#project_add_input');
+      const project_list = document.querySelector('#project_list');
+      const new_scraip_button = document.querySelector('#new_scraip_button');
+      const scraip_directory = document.querySelector('#scraip_directory');
+      const coulomb_checkbox = document.querySelector('#coulomb_checkbox');
+      const screen_width_input = document.querySelector('#screen_width_input');
+      const screen_width_value = document.querySelector('#screen_width_value');
+      const new_arrow_button = document.querySelector('#new_arrow_button');
+
+      project_add_input.focus();
+
+      let storage_projects = localStorage.getItem('projects');
+      let storage_selected_project = localStorage.getItem('selected_project');
+      let storage_scraips = localStorage.getItem('scraips');
+      let storage_mode = localStorage.getItem('mode');
+      let storage_z_count = localStorage.getItem('z_count');
+      let storage_screen_width = localStorage.getItem('screen_width');
+
+      if (storage_projects === null) {
+        localStorage.setItem('projects', '');
+        storage_projects = '';
+      }
+      if (storage_selected_project === null) {
+        localStorage.setItem('selected_project', '');
+        storage_selected_project = '';
+      }
+      if (storage_scraips === null) {
+        localStorage.setItem('scraips', '');
+        storage_scraips = '';
+      }
+      if (storage_mode === null) {
+        localStorage.setItem('mode', 'default');
+        storage_mode = 'default';
+      }
+      if (storage_z_count === null) {
+        localStorage.setItem('z_count', '1');
+        storage_z_count = '1';
+      }
+      if (storage_screen_width === null) {
+        localStorage.setItem('screen_width', '100');
+        storage_screen_width = '100';
+      }
+
+      if (storage_mode === 'default') {
+        coulomb_checkbox.checked = false;
+      } else {
+        coulomb_checkbox.checked = true;
+      }
+
+      screen_width_input.value = storage_screen_width;
+      screen_width_value.textContent = storage_screen_width + '%';
+
+      let project_names =
+        storage_projects === '' ? [] : storage_projects.split('');
+      for (let project_name of project_names) {
+        const project_button = document.createElement('div');
+        if (localStorage.getItem('selected_project') === project_name) {
+          project_button.classList.add('project_selected_button');
+        } else {
+          project_button.classList.add('project_button');
+        }
+        project_button.textContent = project_name;
+        project_button.addEventListener('click', () => {
+          localStorage.setItem('selected_project', project_name);
+          location.reload();
+        });
+        project_list.appendChild(project_button);
+      }
+
+      let scraip_list = (
+        storage_scraips === '' ? [] : storage_scraips.split('')
+      ).map((scraip) => scraip.split(''));
+      // 처음 거는 scraips 별 분류, 다음 거는 제목-내용-x좌표-y좌표 분류
+
+      new_arrow_button.addEventListener('click', () => {
+        if (storage_mode === 'coulomb') {
+          coulomb_checkbox.click();
+        }
+        storage_z_count = (Number(storage_z_count) + 1).toString();
+        localStorage.setItem('z_count', storage_z_count);
+        const extreme_random_number = Math.floor(Math.random() * 9999999) + 1;
+
+        scraip_list.push([
+          storage_selected_project,
+          `Scraiper 사용 메뉴얼`,
+          'AI 답변 스크래퍼 Scraiper 접속을 환영합니다. \n아래는 사용 메뉴얼입니당~~.',
+          window.innerWidth / 2 + Math.floor(Math.random() * 101) - 50,
+          window.innerHeight / 2 + Math.floor(Math.random() * 101) - 50,
+          storage_z_count,
+          500,
+          500,
+          extreme_random_number,
+        ]);
+        localStorage.setItem(
+          'scraips',
+          scraip_list.map((scraip) => scraip.join('')).join('')
+        );
+        location.reload();
+      });
+
+      if (storage_selected_project === '' && scraip_list.length === 0) {
+        new_arrow_button.click();
+      }
+
+      let is_dragging = false;
+      let dragging_thing = 'nothing';
+      let inital_xy_when_dragging = [0, 0];
+      let offsetX = 0;
+      let offsetY = 0;
+      let current_element;
+
+      for (let [
+        project,
+        title,
+        content,
+        x,
+        y,
+        z_index,
+        width,
+        height,
+        ern,
+      ] of scraip_list) {
+        if (project !== storage_selected_project) {
+          continue;
+        }
+
+        const scraip_element = document.createElement('div');
+        const handle_element = document.createElement('div');
+        const title_element = document.createElement('input');
+        const content_element = document.createElement('textarea');
+        const x_element = document.createElement('div');
+        const sc_handle_element = document.createElement('div'); // sc = size change
+        const view_button_element = document.createElement('div');
+        const view_element = document.createElement('div');
+
+        title_element.value = title;
+        title_element.type = 'text';
+        content_element.value = content;
+        x_element.textContent = '×';
+        view_button_element.textContent = '편집';
+
+        scraip_element.classList.add('scraip');
+        handle_element.classList.add('handle');
+        title_element.classList.add('title');
+        content_element.classList.add('content');
+        view_element.classList.add('view');
+        x_element.classList.add('scraipx');
+        sc_handle_element.classList.add('sc_handle');
+        view_button_element.classList.add('view_button');
+
+        BlueDown.activateAutoFill(content_element);
+        BlueDown.apply(content_element.value, view_element);
+
+        scraip_element.style.left = `${x}px`;
+        scraip_element.style.top = `${y}px`;
+        scraip_element.style.zIndex = Number(z_index);
+        scraip_element.style.width = `${width}px`;
+        scraip_element.style.height = `${height}px`;
+
+        scraip_element.dataset.ern = ern;
+        {
+          const svg = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'svg'
+          );
+          svg.setAttribute('width', '40');
+          svg.setAttribute('height', '6');
+          svg.style.display = 'block';
+
+          const line = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'rect'
+          );
+          line.setAttribute('x', 0);
+          line.setAttribute('y', 2);
+          line.setAttribute('width', 40);
+          line.setAttribute('height', 2);
+          line.setAttribute('rx', 1);
+          line.setAttribute('fill', 'white');
+
+          svg.appendChild(line);
+          handle_element.appendChild(svg);
+        }
+
+        {
+          const svgNS = 'http://www.w3.org/2000/svg';
+
+          const svg = document.createElementNS(svgNS, 'svg');
+          svg.setAttribute('width', '24');
+          svg.setAttribute('height', '24');
+          svg.setAttribute('viewBox', '0 0 24 24');
+          svg.style.transform = 'rotate(180deg)';
+          svg.style.transformOrigin = 'center';
+
+          const path = document.createElementNS(svgNS, 'path');
+          path.setAttribute('d', 'M4 20 A16 16 0 0 1 20 4');
+          path.setAttribute('fill', 'none');
+          path.setAttribute('stroke', 'currentColor');
+          path.setAttribute('stroke-width', '3');
+          path.setAttribute('stroke-linecap', 'round');
+
+          svg.appendChild(path);
+          sc_handle_element.appendChild(svg);
+        }
+
+        scraip_element.appendChild(handle_element);
+        scraip_element.appendChild(title_element);
+        scraip_element.appendChild(content_element);
+        scraip_element.appendChild(view_element);
+        scraip_element.appendChild(x_element);
+        scraip_element.appendChild(sc_handle_element);
+        scraip_element.appendChild(view_button_element);
+        scraip_directory.appendChild(scraip_element);
+
+        scraip_element.addEventListener('mousedown', (event) => {
+          if (
+            event.target === title_element ||
+            event.target === content_element ||
+            event.target === view_element ||
+            view_element.contains(event.target)
+          ) {
+            return;
+          }
+          current_element = event.target;
+          for (let i = 0; i <= 2; i++) {
+            current_element = current_element.classList.contains('scraip')
+              ? current_element
+              : current_element.parentElement;
+          }
+          is_dragging = true;
+          offsetX =
+            event.clientX -
+            (sc_handle_element.contains(event.target)
+              ? 0
+              : scraip_element.offsetLeft);
+          offsetY =
+            event.clientY -
+            (sc_handle_element.contains(event.target)
+              ? 0
+              : scraip_element.offsetTop);
+
+          storage_z_count = (Number(storage_z_count) + 1).toString();
+          localStorage.setItem('z_count', storage_z_count);
+          current_element.style.zIndex = Number(storage_z_count);
+          for (let [
+            index,
+            [project, title, content, x, y, z_index, width, height, ern_],
+          ] of scraip_list.entries()) {
+            if (ern === ern_) {
+              scraip_list[index][5] = storage_z_count;
+              break;
+            }
+          }
+          localStorage.setItem(
+            'scraips',
+            scraip_list.map((scraip) => scraip.join('')).join('')
+          );
+
+          if (sc_handle_element.contains(event.target)) {
+            dragging_thing = 'sc_handle';
+            inital_xy_when_dragging = [
+              Number(current_element.style.width.replace('px', '')),
+              Number(current_element.style.height.replace('px', '')),
+            ];
+          } else {
+            dragging_thing = 'scraip_element';
+          }
+        });
+
+        title_element.addEventListener('input', () => {
+          for (let [
+            index,
+            [project, title, content, x, y, z_index, width, height, ern_],
+          ] of scraip_list.entries()) {
+            if (ern === ern_) {
+              scraip_list[index][1] = title_element.value;
+              localStorage.setItem(
+                'scraips',
+                scraip_list.map((scraip) => scraip.join('')).join('')
+              );
+              break;
+            }
+          }
+        });
+
+        content_element.addEventListener('input', () => {
+          for (let [
+            index,
+            [project, title, content, x, y, z_index, width, height, ern_],
+          ] of scraip_list.entries()) {
+            if (ern === ern_) {
+              scraip_list[index][2] = content_element.value;
+              localStorage.setItem(
+                'scraips',
+                scraip_list.map((scraip) => scraip.join('')).join('')
+              );
+              break;
+            }
+          }
+        });
+
+        content_element.onkeydown = (e) => {
+          if (e.ctrlKey && e.key === 'Enter') {
+            view_button_element.click();
+          }
+        };
+
+        x_element.addEventListener('click', () => {
+          for (let [
+            index,
+            [project, title, content, x, y, z_index, width, height, ern_],
+          ] of scraip_list.entries()) {
+            if (ern === ern_) {
+              scraip_list.splice(index, 1);
+              localStorage.setItem(
+                'scraips',
+                scraip_list.map((scraip) => scraip.join('')).join('')
+              );
+              break;
+            }
+          }
+          location.reload();
+        });
+
+        view_button_element.addEventListener('click', (event) => {
+          if (event.target.textContent === '편집') {
+            event.target.textContent = '보기';
+            view_element.style.display = 'none';
+            content_element.style.display = 'block';
+          } else {
+            BlueDown.apply(content_element.value, view_element);
+            event.target.textContent = '편집';
+            view_element.style.display = 'block';
+            content_element.style.display = 'none';
+          }
+        });
+
+        let view_dragged = false;
+        view_element.addEventListener('mousedown', () => {
+          view_dragged = false;
+        });
+        view_element.addEventListener('mousemove', () => {
+          view_dragged = true;
+        });
+        view_element.addEventListener('mouseup', () => {
+          if (!view_dragged) {
+            const selection = window.getSelection();
+            if (selection && !selection.isCollapsed) return;
+            view_button_element.click();
+          }
+        });
+      }
+
+      document.addEventListener('mousemove', (event) => {
+        if (!is_dragging) return;
+        if (dragging_thing === 'scraip_element') {
+          current_element.style.left = `${event.clientX - offsetX}px`;
+          current_element.style.top = `${event.clientY - offsetY}px`;
+        }
+        if (dragging_thing === 'sc_handle') {
+          current_element.style.width = `${
+            inital_xy_when_dragging[0] + (event.clientX - offsetX) * 2
+          }px`;
+          current_element.style.height = `${
+            inital_xy_when_dragging[1] + (event.clientY - offsetY) * 2
+          }px`;
+        }
+      });
+
+      document.addEventListener('mouseup', () => {
+        is_dragging = false;
+        if (current_element === undefined) {
+          return;
+        }
+        for (let [
+          index,
+          [project, title, content, x, y, z_index, width, height, ern],
+        ] of scraip_list.entries()) {
+          if (ern === current_element.dataset.ern) {
+            scraip_list[index][3] = current_element.style.left.replace(
+              'px',
+              ''
+            );
+            scraip_list[index][4] = current_element.style.top.replace('px', '');
+            scraip_list[index][6] = current_element.style.width.replace(
+              'px',
+              ''
+            );
+            scraip_list[index][7] = current_element.style.height.replace(
+              'px',
+              ''
+            );
+            localStorage.setItem(
+              'scraips',
+              scraip_list.map((scraip) => scraip.join('')).join('')
+            );
+          }
+        }
+      });
+
+      project_add_form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const value = project_add_input.value.trim();
+        if (value.startsWith('rm ')) {
+          project_names = project_names.filter(
+            (project_name) => project_name !== value.replace('rm ', '').trim()
+          );
+          localStorage.setItem('projects', project_names.join(''));
+          scraip_list = scraip_list.filter(
+            ([project, title, content, x, y, z_index, width, height, ern]) =>
+              project !== value.replace('rm ', '').trim()
+          );
+          localStorage.setItem(
+            'scraips',
+            scraip_list.map((scraip) => scraip.join('')).join('')
+          );
+          if (storage_selected_project === value.replace('rm ', '').trim()) {
+            localStorage.setItem('selected_project', '');
+          }
+          location.reload();
+        } else {
+          if (project_names.includes(value)) {
+            alert('already exist');
+          } else {
+            localStorage.setItem(
+              'projects',
+              [value, ...project_names].join('')
+            );
+            localStorage.setItem('selected_project', value);
+            location.reload();
+          }
+        }
+      });
+
+      new_scraip_button.addEventListener('click', () => {
+        if (project_names.length === 0) {
+          alert('프로젝트를 먼저 만드시오.');
+          return;
+        }
+        if (storage_selected_project === '') {
+          alert('프로젝트를 선택하시오.');
+          return;
+        }
+        const random_number = (Math.floor(Math.random() * 9999) + 1)
+          .toString()
+          .padStart(4, '0');
+        const extreme_random_number = Math.floor(Math.random() * 9999999) + 1;
+        storage_z_count = (Number(storage_z_count) + 1).toString();
+        localStorage.setItem('z_count', storage_z_count);
+
+        scraip_list.push([
+          storage_selected_project,
+          `Untitled-Scraip-${random_number}`,
+          'No contents',
+          500 + Math.floor(Math.random() * 201) - 100,
+          500 + Math.floor(Math.random() * 201) - 100,
+          storage_z_count,
+          300,
+          300,
+          extreme_random_number,
+        ]);
+        localStorage.setItem(
+          'scraips',
+          scraip_list.map((scraip) => scraip.join('')).join('')
+        );
+        location.reload();
+      });
+
+      let scraips_in_this_project = scraip_list.filter(
+        ([project, title, content, x, y, z_index, width, height, ern]) =>
+          project === storage_selected_project
+      );
+
+      let velocities = Array.from(
+        { length: scraips_in_this_project.length },
+        () => [0, 0]
+      );
+
+      coulomb_checkbox.addEventListener('change', (event) => {
+        storage_mode = event.target.checked ? 'coulomb' : 'default';
+        localStorage.setItem('mode', storage_mode);
+        if (storage_mode === 'coulomb') {
+          velocities = Array.from(
+            { length: scraips_in_this_project.length },
+            () => [0, 0]
+          );
+        }
+      });
+
+      const q = 30000;
+      const damping = 0.9;
+      const softening = 10000;
+
+      let prev = performance.now();
+      let saveTimer = 0;
+
+      function loop(now) {
+        if (storage_mode === 'default' || is_dragging === true) {
+          prev = now;
+          requestAnimationFrame(loop);
+          return;
+        }
+
+        let dt = (now - prev) / 1000;
+        dt = Math.min(dt, 0.033);
+        prev = now;
+
+        let coordinates = scraips_in_this_project.map(([, , , x, y]) => [
+          Number(x),
+          Number(y),
+        ]);
+
+        let acceleration = Array.from({ length: coordinates.length }, () => [
+          0, 0,
+        ]);
+
+        for (let i = 0; i < coordinates.length; i++) {
+          for (let j = 0; j < coordinates.length; j++) {
+            if (i === j) continue;
+
+            const dx = coordinates[i][0] - coordinates[j][0];
+            const dy = coordinates[i][1] - coordinates[j][1];
+
+            const theta = Math.atan(dy / dx);
+
+            const q1 =
+              Math.sqrt(
+                (scraips_in_this_project[i][6] * Math.cos(theta)) ** 2 +
+                  (scraips_in_this_project[i][7] * Math.sin(theta)) ** 2
+              ) * 120;
+            const q2 =
+              Math.sqrt(
+                (scraips_in_this_project[j][6] * Math.cos(theta)) ** 2 +
+                  (scraips_in_this_project[j][7] * Math.sin(theta)) ** 2
+              ) * 120;
+
+            const distSq = dx * dx + dy * dy + softening;
+            const dist = Math.sqrt(distSq);
+
+            const force = (q1 * q2) / distSq;
+
+            acceleration[i][0] += (dx / dist) * force;
+            acceleration[i][1] += (dy / dist) * force;
+          }
+        }
+
+        const width =
+          (window.innerWidth * Number(screen_width_input.value)) / 100;
+        const height = window.innerHeight;
+
+        for (let i = 0; i < coordinates.length; i++) {
+          const qw = scraips_in_this_project[i][6] * 100;
+          const qh = scraips_in_this_project[i][7] * 100;
+
+          {
+            const dx = coordinates[i][0] - 250;
+            const dy = 0;
+
+            const distSq = dx * dx + softening;
+            const dist = Math.sqrt(distSq);
+
+            const force = (q * qw) / distSq;
+
+            acceleration[i][0] += (Math.abs(dx) / dist) * force;
+          }
+
+          {
+            const dx = coordinates[i][0] - width;
+            const dy = 0;
+
+            const distSq = dx * dx + softening;
+            const dist = Math.sqrt(distSq);
+
+            const force = (q * qw) / distSq;
+
+            acceleration[i][0] += (-Math.abs(dx) / dist) * force;
+          }
+
+          {
+            const dx = 0;
+            const dy = coordinates[i][1] - 0;
+
+            const distSq = dy * dy + softening;
+            const dist = Math.sqrt(distSq);
+
+            const force = (q * qh) / distSq;
+
+            acceleration[i][1] += (Math.abs(dy) / dist) * force;
+          }
+
+          {
+            const dx = 0;
+            const dy = coordinates[i][1] - height;
+
+            const distSq = dy * dy + softening;
+            const dist = Math.sqrt(distSq);
+
+            const force = (q * qh) / distSq;
+
+            acceleration[i][1] += (-Math.abs(dy) / dist) * force;
+          }
+        }
+
+        for (let i = 0; i < coordinates.length; i++) {
+          const x = coordinates[i][0];
+          const y = coordinates[i][1];
+
+          let foobar = 0;
+
+          if (x < 250) {
+            velocities[i][0] = 100 * (250 - x) + 5000;
+            acceleration[i][0] = 0;
+            foobar += 1;
+          }
+
+          if (x > width) {
+            velocities[i][0] = 100 * (width - x) - 5000;
+            acceleration[i][0] = 0;
+            foobar += 1;
+          }
+
+          if (y < 0) {
+            velocities[i][1] = 100 * -y + 5000;
+            acceleration[i][1] = 0;
+            foobar += 1;
+          }
+
+          if (y > height) {
+            velocities[i][1] = 100 * (height - y) - 5000;
+            acceleration[i][1] = 0;
+            foobar += 1;
+          }
+        }
+
+        for (let i = 0; i < coordinates.length; i++) {
+          velocities[i][0] =
+            (velocities[i][0] + acceleration[i][0] * dt) * damping;
+          velocities[i][1] =
+            (velocities[i][1] + acceleration[i][1] * dt) * damping;
+
+          coordinates[i][0] += velocities[i][0] * dt;
+          coordinates[i][1] += velocities[i][1] * dt;
+
+          for (let [
+            index,
+            [project, title, content, x, y, z_index, width, height, ern],
+          ] of scraip_list.entries()) {
+            if (ern === scraips_in_this_project[i].at(-1)) {
+              scraip_list[index][3] = coordinates[i][0];
+              scraip_list[index][4] = coordinates[i][1];
+
+              const el = document.querySelector(`[data-ern="${ern}"]`);
+              el.style.left = `${coordinates[i][0]}px`;
+              el.style.top = `${coordinates[i][1]}px`;
+            }
+          }
+        }
+
+        saveTimer += dt;
+        if (saveTimer > 0.5) {
+          localStorage.setItem(
+            'scraips',
+            scraip_list.map((s) => s.join('')).join('')
+          );
+          saveTimer = 0;
+        }
+
+        requestAnimationFrame(loop);
+      }
+
+      requestAnimationFrame(loop);
+
+      screen_width_input.addEventListener('input', (event) => {
+        screen_width_value.textContent = event.target.value + '%';
+        document.querySelector('html').style.width = event.target.value + 'vw';
+        localStorage.setItem('screen_width', event.target.value);
+      });
+    </script>
+  </body>
+</html>

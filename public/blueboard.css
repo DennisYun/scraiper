@@ -1,0 +1,22 @@
+.bold {
+  font-weight: bold;
+}
+
+.underline {
+  text-decoration: underline;
+}
+
+.h1 {
+  font-weight: bold;
+  font-size: 40px;
+}
+
+.h2 {
+  font-weight: bold;
+  font-size: 33px;
+}
+
+.h3 {
+  font-weight: bold;
+  font-size: 25px;
+}

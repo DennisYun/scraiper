@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "scraiper",
+  "version": "1.0",
+  "description": "ChatGPT Dialog Scraper",
+  "content_scripts": [
+    {
+      "matches": ["https://chatgpt.com/*"],
+      "js": ["content.js"]
+    }
+  ]
+}
