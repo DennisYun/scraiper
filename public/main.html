@@ -4,12 +4,7 @@
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="
-    width=device-width,
-    initial-scale=1.0,
-    maximum-scale=1.0,
-    user-scalable=no
-  "
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
     <link rel="stylesheet" href="blueboard.css" />
     <style>
@@ -1099,6 +1094,11 @@
         screen_width_value.textContent = event.target.value + '%';
         document.querySelector('html').style.width = event.target.value + 'vw';
         localStorage.setItem('screen_width', event.target.value);
+      });
+
+      window.addEventListener('storage', (e) => {
+        if (!e.key || !e.newValue) return;
+        syncUI(e.key, JSON.parse(e.newValue));
       });
     </script>
   </body>
