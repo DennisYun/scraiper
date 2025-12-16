@@ -2,7 +2,15 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="
+    width=device-width,
+    initial-scale=1.0,
+    maximum-scale=1.0,
+    user-scalable=no
+  "
+    />
     <link rel="stylesheet" href="blueboard.css" />
 
     <style>
@@ -10,10 +18,17 @@
         font-family: 'Pretendard-Regular';
         src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff')
           format('woff');
+        font-weight: 400;
+        font-style: normal;
       }
       @font-face {
         font-family: 'Pretendard-ExtraBold';
         src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-ExtraBold.woff')
+          format('woff');
+      }
+      @font-face {
+        font-family: 'Pretendard-Thin';
+        src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Thin.woff')
           format('woff');
       }
 
@@ -29,7 +44,7 @@
       }
 
       .scraip {
-        position: relative;
+        position: absolute;
         background-color: rgb(68, 68, 78);
         border-radius: 30px;
         padding: 20px;
@@ -37,7 +52,11 @@
         flex-direction: column;
         gap: 10px;
         box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
-        box-sizing: border-box;
+        /* box-sizing: border-box; */
+        top: 50vh;
+        left: 50vw;
+        transform: translate(-50%, -50%);
+        /* box-sizing: border-box; */
       }
 
       .handle {
@@ -59,6 +78,9 @@
         color: white;
         resize: none;
         display: none;
+        overflow-x: hidden;
+        overflow-wrap: break-word;
+        word-break: break-word;
         white-space: pre-wrap;
       }
 
@@ -67,6 +89,10 @@
         font-family: 'Pretendard-Regular';
         color: white;
         overflow: auto;
+        box-sizing: border-box;
+        overflow-x: hidden;
+        overflow-wrap: break-word;
+        word-break: break-word;
         white-space: pre-wrap;
       }
 
@@ -80,7 +106,7 @@
         cursor: pointer;
         position: absolute;
         top: 12px;
-        right: 20px;
+        right: 55px;
       }
 
       /* === resize handle (fixed direction) === */
@@ -104,10 +130,23 @@
         text-align: center;
         padding: 10px;
         border-radius: 100px;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      #close {
+        font-size: 45px;
+        font-family: 'Pretendard';
+        position: absolute;
+        right: 20px;
+        top: -6px;
+        color: red;
+        cursor: pointer;
+        user-select: none;
       }
     </style>
 
-    <title>Scraip Single</title>
+    <title>Scraiper</title>
   </head>
 
   <body>
@@ -129,7 +168,7 @@
       <div id="submit">저장</div>
       <!-- toggle -->
       <div class="view_button" id="toggleBtn">편집</div>
-
+      <div id="close">×</div>
       <!-- resize handle -->
       <div class="sc_handle" id="resizeHandle">
         <svg width="20" height="20" viewBox="0 0 20 20">
@@ -146,14 +185,22 @@
     <script src="blueboard.js"></script>
 
     <script>
+      const params = new URLSearchParams(window.location.search);
+      const content = params.get('content') ?? 'default_content';
+
       const toggleBtn = document.getElementById('toggleBtn');
       const textarea = document.getElementById('editor');
       const view = document.getElementById('viewer');
       const scraip = document.getElementById('scraip');
       const submit = document.querySelector('#submit');
       const title = document.querySelector('.title');
+      const closing = document.querySelector('#close');
 
-      scraip.style.width = '350px';
+      closing.addEventListener('click', () => {
+        window.close();
+      });
+
+      scraip.style.width = '400px';
       scraip.style.height = '350px';
 
       let storage_z_count = localStorage.getItem('z_count');
@@ -181,6 +228,7 @@
         .toString()
         .padStart(4, '0');
       title.value = `Untitled-Scraip-${random_number}`;
+      textarea.value = content;
 
       /* === BlueDown 초기 렌더 === */
       BlueDown.activateAutoFill(textarea);
@@ -259,6 +307,8 @@
           'scraips',
           scraip_list.map((scraip) => scraip.join('')).join('')
         );
+
+        window.close();
       });
 
       document.onkeydown = (e) => {

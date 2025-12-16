@@ -2,7 +2,15 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="
+    width=device-width,
+    initial-scale=1.0,
+    maximum-scale=1.0,
+    user-scalable=no
+  "
+    />
     <link rel="stylesheet" href="blueboard.css" />
     <style>
       @font-face {
@@ -30,6 +38,7 @@
       }
 
       #projects_box {
+        user-select: none;
         position: fixed;
         background-color: rgb(68, 68, 78);
         border-radius: 30px;
@@ -57,6 +66,7 @@
         padding: 10px 10px;
         border-radius: 100px;
         transition: background-color 0.2s;
+        cursor: pointer;
       }
 
       .project_button:hover {
@@ -70,6 +80,7 @@
         padding: 10px 10px;
         border-radius: 100px;
         background-color: white;
+        cursor: pointer;
       }
 
       #project_add_form {
@@ -113,6 +124,8 @@
         transition: background-color 0.2s, color 0.2s;
         z-index: 100000;
         box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.4);
+        cursor: pointer;
+        user-select: none;
       }
 
       #new_scraip_button:hover {
@@ -136,6 +149,8 @@
         transition: background-color 0.2s, color 0.2s;
         z-index: 100000;
         box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.4);
+        cursor: pointer;
+        user-select: none;
       }
 
       #new_arrow_button:hover {
@@ -153,12 +168,14 @@
         gap: 10px;
         box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2);
         transform: translate(-50%, -50%);
+        touch-action: none;
       }
 
       .handle {
         display: flex;
         align-items: center;
         justify-content: center;
+        touch-action: none;
       }
 
       .title {
@@ -175,6 +192,10 @@
         font-family: 'Pretendard';
         resize: none;
         display: none;
+        overflow-x: hidden;
+        overflow-wrap: break-word;
+        word-break: break-word;
+        white-space: pre-wrap;
       }
 
       .scraipx {
@@ -186,6 +207,8 @@
         right: 20px;
         top: 0;
         color: red;
+        cursor: pointer;
+        user-select: none;
       }
 
       .scraip:hover > .scraipx {
@@ -198,6 +221,8 @@
         position: absolute;
         bottom: 3px;
         right: 8px;
+        touch-action: none;
+        cursor: nwse-resize;
       }
 
       .scraip:hover > .sc_handle {
@@ -205,6 +230,7 @@
       }
 
       #coulomb_mode_box {
+        user-select: none;
         display: flex;
         gap: 5px;
         font-family: 'Pretendard';
@@ -250,6 +276,7 @@
       }
 
       #screen_width_box {
+        user-select: none;
         display: flex;
         gap: 5px;
         font-family: 'Pretendard';
@@ -294,6 +321,7 @@
         top: 12px;
         opacity: 0;
         transition: opacity 0.2s;
+        cursor: pointer;
       }
 
       .scraip:hover > .view_button {
@@ -304,7 +332,10 @@
         flex: 1;
         font-family: 'Pretendard-Regular';
         color: white;
-        overflow: auto;
+        overflow-x: hidden;
+        overflow-wrap: break-word;
+        word-break: break-word;
+        white-space: pre-wrap;
       }
     </style>
     <title>Scraiper</title>
@@ -589,7 +620,7 @@
           const path = document.createElementNS(svgNS, 'path');
           path.setAttribute('d', 'M4 20 A16 16 0 0 1 20 4');
           path.setAttribute('fill', 'none');
-          path.setAttribute('stroke', 'currentColor');
+          path.setAttribute('stroke', 'white');
           path.setAttribute('stroke-width', '3');
           path.setAttribute('stroke-linecap', 'round');
 
@@ -606,7 +637,7 @@
         scraip_element.appendChild(view_button_element);
         scraip_directory.appendChild(scraip_element);
 
-        scraip_element.addEventListener('mousedown', (event) => {
+        scraip_element.addEventListener('pointerdown', (event) => {
           if (
             event.target === title_element ||
             event.target === content_element ||
@@ -730,13 +761,13 @@
         });
 
         let view_dragged = false;
-        view_element.addEventListener('mousedown', () => {
+        view_element.addEventListener('pointerdown', () => {
           view_dragged = false;
         });
-        view_element.addEventListener('mousemove', () => {
+        view_element.addEventListener('pointermove', () => {
           view_dragged = true;
         });
-        view_element.addEventListener('mouseup', () => {
+        view_element.addEventListener('pointerup', () => {
           if (!view_dragged) {
             const selection = window.getSelection();
             if (selection && !selection.isCollapsed) return;
@@ -745,7 +776,7 @@
         });
       }
 
-      document.addEventListener('mousemove', (event) => {
+      document.addEventListener('pointermove', (event) => {
         if (!is_dragging) return;
         if (dragging_thing === 'scraip_element') {
           current_element.style.left = `${event.clientX - offsetX}px`;
@@ -761,7 +792,7 @@
         }
       });
 
-      document.addEventListener('mouseup', () => {
+      document.addEventListener('pointerup', () => {
         is_dragging = false;
         if (current_element === undefined) {
           return;
